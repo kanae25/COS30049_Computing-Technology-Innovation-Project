@@ -39,7 +39,6 @@ def clean_text(text: str) -> str:
     # NOTE: no re.sub(r"\d+", " ", t) here — we keep numbers
     return _ws(t)
 
-
 def drop_empty_dupes(df: pd.DataFrame, col: str) -> pd.DataFrame:
     # Ensure it's a string Series (guard against duplicate-named columns)
     col_data = df[col]
@@ -61,7 +60,6 @@ def to_2col(df: pd.DataFrame) -> pd.DataFrame:
     out = drop_empty_dupes(out, "text").reset_index(drop=True)
     return out
 
-
 def standardize_labels(df: pd.DataFrame, label_col: str) -> pd.DataFrame:
     # map any common strings -> 0/1  (0 = harmless/ham, 1 = spam)
     map_str = {
@@ -77,9 +75,29 @@ def standardize_labels(df: pd.DataFrame, label_col: str) -> pd.DataFrame:
     df["label"] = df["label"].astype(int)
     return df
 
+# CSV reader with UTF-8 handling
+def safe_read_csv(path: str) -> pd.DataFrame:
+    """
+    First read CSV using UTF-8, then common fallbacks to handle mixed encodings
+    without adding third-party dependencies.
+    """
+    try:
+        return pd.read_csv(path, encoding="utf-8")
+    except UnicodeDecodeError:
+        pass
+    try:
+        return pd.read_csv(path, encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        pass
+    try:
+        return pd.read_csv(path, encoding="cp1252")
+    except UnicodeDecodeError:
+        pass
+    return pd.read_csv(path, encoding="latin1")
+
 # ---------- Dataset processors ----------
 def process_email_spam(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path)
+    df = safe_read_csv(path)
     cols = {c.lower(): c for c in df.columns}
     title = cols.get("title")
     text  = cols.get("text")
@@ -103,7 +121,7 @@ def process_email_spam(path: str) -> pd.DataFrame:
     return to_2col(df)
 
 def process_emails(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path)
+    df = safe_read_csv(path)
     cols = {c.lower(): c for c in df.columns}
     text = cols.get("text")
     lab  = cols.get("spam") or cols.get("label") or cols.get("type")
@@ -119,7 +137,7 @@ def process_emails(path: str) -> pd.DataFrame:
     return to_2col(df)
 
 def process_text_spam(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path)
+    df = safe_read_csv(path)
     cols = {c.lower(): c for c in df.columns}
     # Accept capitalized headers from this file
     text = cols.get("text") or cols.get("message") or cols.get("content")
@@ -135,7 +153,6 @@ def process_text_spam(path: str) -> pd.DataFrame:
     df["clean_text"] = df["text"].map(clean_text)
     df = df[df["clean_text"].str.len() > 0]
     return to_2col(df)
-
 
 # ---------- Main ----------
 def main():
