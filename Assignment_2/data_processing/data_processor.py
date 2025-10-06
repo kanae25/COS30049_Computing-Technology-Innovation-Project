@@ -40,14 +40,13 @@ def clean_text(text: str) -> str:
     return _ws(t)
 
 def drop_empty_dupes(df: pd.DataFrame, col: str) -> pd.DataFrame:
-    # Ensure it's a string Series (guard against duplicate-named columns)
     col_data = df[col]
     if isinstance(col_data, pd.DataFrame):
-        col_data = col_data.iloc[:, 0]  # take the first 'text' if duplicates exist
+        col_data = col_data.iloc[:, 0]
     s = col_data.astype(str)
 
     df = df.assign(**{col: s})
-    df = df[df[col].str.strip().astype(bool)]
+    df = df[df[col].str.strip().astype(bool)] # remove empty/null text rows
     return df.drop_duplicates(subset=[col])
 
 def to_2col(df: pd.DataFrame) -> pd.DataFrame:
