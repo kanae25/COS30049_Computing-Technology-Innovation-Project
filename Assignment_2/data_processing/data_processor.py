@@ -136,16 +136,15 @@ def process_emails(path: str) -> pd.DataFrame:
 def process_text_spam(path: str) -> pd.DataFrame:
     df = safe_read_csv(path)
     cols = {c.lower(): c for c in df.columns}
-    # Accept capitalized headers from this file
     text = cols.get("text") or cols.get("message") or cols.get("content")
     lab  = (cols.get("label") or cols.get("spam") or cols.get("type") or
-            cols.get("target") or cols.get("category"))  # <-- added 'category'
+            cols.get("target") or cols.get("category"))
 
     if not text or not lab:
         raise ValueError("text_spam.csv needs 'text/message/content' AND 'label/spam/type/target/category'")
 
     df["text"] = df[text].fillna("").astype(str)
-    df = standardize_labels(df, lab)   # maps 'ham'->0, 'spam'->1 already
+    df = standardize_labels(df, lab)
     df = drop_empty_dupes(df, "text")
     df["clean_text"] = df["text"].map(clean_text)
     df = df[df["clean_text"].str.len() > 0]
