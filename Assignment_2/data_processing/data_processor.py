@@ -31,12 +31,12 @@ def clean_text(text: str) -> str:
     if not isinstance(text, str):
         return ""
     t = text.replace("\u00A0", " ")
-    t = HTML_RE.sub(" ", t)                    # drop html tags
-    t = URL_RE.sub(" ", t)                     # drop full urls
-    t = EMAIL_RE.sub(" ", t)                   # drop email 
+    t = HTML_RE.sub(" ", t) # drop html tags
+    t = URL_RE.sub(" ", t) # drop full urls
+    t = EMAIL_RE.sub(" ", t) # drop email 
     t = unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode("ascii")
-    t = t.lower().translate(PUNCT_TABLE)       # remove punctuation keep digits
-    return re.sub(r"\s+", " ", t).strip()
+    t = t.lower().translate(PUNCT_TABLE) # remove punctuation keep digits
+    return re.sub(r"\s+", " ", t).strip() # remove extra whitespace
 
 def drop_empty_dupes(df: pd.DataFrame, col: str) -> pd.DataFrame:
     col_data = df[col]
