@@ -59,7 +59,7 @@ def to_2col(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 def standardize_labels(df: pd.DataFrame, label_col: str) -> pd.DataFrame:
-    # map any common strings -> 0/1  (0 = harmless/ham, 1 = spam)
+    # map common strings to 0/1  (0 = harmless/ham, 1 = spam)
     map_str = {
         "spam": 1, "ham": 0, "not spam": 0, "non-spam": 0, "non spam": 0, "legit": 0,
         "harmless": 0
@@ -68,7 +68,6 @@ def standardize_labels(df: pd.DataFrame, label_col: str) -> pd.DataFrame:
         df["label"] = df[label_col].astype(str).str.lower().map(map_str)
     else:
         df["label"] = df[label_col].astype(int).clip(0, 1)
-    # any unknown strings -> NaN; drop them
     df = df.dropna(subset=["label"])
     df["label"] = df["label"].astype(int)
     return df
