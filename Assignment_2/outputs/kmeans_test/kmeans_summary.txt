@@ -1,0 +1,10 @@
+K-MEANS CLUSTERING SUMMARY
+========================================
+Optimal k: 2
+Silhouette: 0.493
+Calinski: 73.41
+Davies: 0.653
+
+Spam clusters: []
+Legit clusters: [0, 1]
+Mixed clusters: []
