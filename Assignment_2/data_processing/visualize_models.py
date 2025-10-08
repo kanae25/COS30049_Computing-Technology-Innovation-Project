@@ -24,8 +24,14 @@ from sklearn.metrics import silhouette_samples
 from scipy.optimize import linear_sum_assignment
 
 # ---------------- Paths ----------------
-THIS_DIR = Path(__file__).parent
-ROOT = THIS_DIR.parent
+try:
+    THIS_DIR = Path(__file__).parent
+except NameError:
+    THIS_DIR = Path.cwd()
+
+# Move up to the project root (cos30049_spam_detection) and include Assignment_2
+ROOT = THIS_DIR.parent / "Assignment_2"
+
 PROCESSED = ROOT / "outputs" / "processed"
 TRAIN = PROCESSED / "emails_merged.train.csv"
 TEST  = PROCESSED / "emails_merged.test.csv"
@@ -33,6 +39,8 @@ MERGED = PROCESSED / "emails_merged.processed.csv"
 
 OUTDIR = ROOT / "outputs" / "analyze_models"
 OUTDIR.mkdir(parents=True, exist_ok=True)
+
+
 
 # ---------------- Helpers -------------
 def load_xy(path: Path):
@@ -156,9 +164,17 @@ mask1 = y_true == 1
 plt.scatter(X_2d[clusters==0, 0], X_2d[clusters==0, 1], alpha=0.35, label="Cluster 0")
 plt.scatter(X_2d[clusters==1, 0], X_2d[clusters==1, 1], alpha=0.35, label="Cluster 1")
 # overlay a small subset of true labels as markers to avoid clutter
-idx = np.linspace(0, len(X_2d)-1, num=min(1000, len(X_2d))).astype(int)
-plt.scatter(X_2d[idx & mask0, 0], X_2d[idx & mask0, 1], marker="o", s=10, alpha=0.8, label="True 0 (subset)")
-plt.scatter(X_2d[idx & mask1, 0], X_2d[idx & mask1, 1], marker="x", s=10, alpha=0.8, label="True 1 (subset)")
+# overlay a small subset of true labels as markers to avoid clutter (fix)
+rng = np.random.default_rng(42)
+sample_n = min(1000, len(X_2d))
+sample_idx = np.sort(rng.choice(len(X_2d), size=sample_n, replace=False))
+
+idx0 = sample_idx[y_true[sample_idx] == 0]
+idx1 = sample_idx[y_true[sample_idx] == 1]
+
+plt.scatter(X_2d[idx0, 0], X_2d[idx0, 1], marker="o", s=10, alpha=0.8, label="True 0 (subset)")
+plt.scatter(X_2d[idx1, 0], X_2d[idx1, 1], marker="x", s=10, alpha=0.8, label="True 1 (subset)")
+
 plt.title("K-Means — 2D SVD Scatter (clusters + true-label overlay)")
 plt.xlabel("SVD-1")
 plt.ylabel("SVD-2")
