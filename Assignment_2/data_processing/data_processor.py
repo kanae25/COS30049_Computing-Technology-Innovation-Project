@@ -164,11 +164,12 @@ def main():
     b.to_csv(b_out, index=False); print(f"Saved: {b_out}  {b.shape}")
     c.to_csv(c_out, index=False); print(f"Saved: {c_out}  {c.shape}")
 
+    # merge all 3 files, remove duplicates
     merged = pd.concat([a, b, c], ignore_index=True).drop_duplicates(subset=["text"]).reset_index(drop=True)
     m_out = os.path.join(DATA_OUT, "emails_merged.processed.csv")
     merged.to_csv(m_out, index=False); print(f"Saved: {m_out}  {merged.shape}")
 
-    # Optional stratified split
+    # optional train and test split
     try:
         from sklearn.model_selection import train_test_split
         train, test = train_test_split(merged, test_size=0.2, random_state=42, stratify=merged["label"])
