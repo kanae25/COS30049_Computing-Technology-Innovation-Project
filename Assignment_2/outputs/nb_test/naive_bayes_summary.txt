@@ -1,0 +1,22 @@
+NAIVE BAYES SPAM DETECTION — MODEL SUMMARY
+============================================================
+
+Best Model: MultinomialNB
+Training Samples: 8572
+Testing  Samples: 2143
+Features: 10000
+
+FINAL PERFORMANCE METRICS:
+- Accuracy:  0.9650
+- Precision: 0.9123
+- Recall:    0.9010
+- F1 Score:  0.9066
+
+CROSS-VALIDATION (F1):
+- Mean: 0.9277
+- Std : 0.0084
+
+MODEL COMPARISON (F1):
+- MultinomialNB: 0.8962
+- BernoulliNB : 0.8256
+- GaussianNB  : 0.5601
